@@ -8,7 +8,7 @@ public class border_bounce : MonoBehaviour {
 	void OnTriggerEnter(Collider other){
 
 		//Temp store object position vector
-		tempdirectionVector = other.gameObject.GetComponent<Movement> ().directionVector;
+		tempdirectionVector = other.gameObject.GetComponent<Movement> ().DirectionVector;
 		//Modify
 		if(gameObject.tag == ("hazard_border")){
 		tempdirectionVector.y *= -1;
@@ -17,6 +17,6 @@ public class border_bounce : MonoBehaviour {
 			tempdirectionVector.x *= -1;
 		}
 		//Write back
-		other.gameObject.GetComponent<Movement> ().directionVector = tempdirectionVector;
+		other.gameObject.GetComponent<Movement> ().DirectionVector = tempdirectionVector;
 	}
 }

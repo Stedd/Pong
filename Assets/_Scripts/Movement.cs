@@ -1,68 +1,84 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Movement : MonoBehaviour {
+public class Movement : MonoBehaviour
+{
 
-	//Movement
-	public 	Vector3 	objectPosition;
-	public 	Vector3 	directionVector;
-	public 	float 		speed;
+    //Movement
+    [SerializeField] private Vector3 objectPosition;
+    [SerializeField] private Vector3 directionVector;
+    [SerializeField] private float speed;
 
-	//Private
-	public	float 		minAngle, maxAngle;
+    //Private
+    [SerializeField] private float minAngle, maxAngle;
 
-	//Timing
-	public 	float 		startTime;
-	public	float 		holdTime;
+    //Timing
+    [SerializeField] private float startTime;
+    [SerializeField] private float holdTime;
 
-	//Scale
-	public	Vector3 	scaleVector = new Vector3 (1,1,1);
-	public	int			pointValue 	= 10;
-		
-	void Start () {
-		//Log start time
-		startTime = Time.time;
-		//Generate new directionVector
-		directionVector = newAngle (true, false, minAngle, maxAngle, 0);
-	}
+    //Scale
+    [SerializeField] private Vector3 scaleVector = new(1, 1, 1);
+    [SerializeField] private int pointValue = 10;
 
-	public void FixedUpdate () {
+    #region Publics
 
-		//Hold ball for "holdTime" before it starts moving
-		if (Time.time > (startTime + holdTime)) {
-			//Temp store object position vector
-			objectPosition = gameObject.GetComponent<Rigidbody> ().transform.position;
-			//Modify
-			objectPosition += directionVector * speed * Time.deltaTime;
-			//Write back
-			gameObject.GetComponent<Rigidbody> ().transform.position = objectPosition;
-		}
-	}
+    public Vector3 DirectionVector
+    {
+        get => directionVector;
+        set => directionVector = value;
+    }
+    #endregion
 
-	public Vector3 newAngle(bool random,bool invertDirection, float min, float max, float newAngle){
+    void OnEnable()
+    {
+        //Log start time
+        startTime = Time.time;
+        //Generate new directionVector
+        directionVector = NewAngle(true, false, minAngle, maxAngle, 0);
+    }
 
-		//Tempvector for return
-		Vector3 tempVector = new Vector3 (0,0,0);
-		float tempAngle;
+    public void FixedUpdate()
+    {
 
-		//Generate random radian from input range
-		if (random) {
-			tempAngle = Random.Range (min, max);
-		}
-		else{
-			tempAngle = newAngle;
-		}
-		
-		tempAngle *= Mathf.Deg2Rad;
+        //Hold ball for "holdTime" before it starts moving
+        if (Time.time > (startTime + holdTime))
+        {
+            //Temp store object position vector
+            objectPosition = gameObject.GetComponent<Rigidbody>().transform.position;
+            //Modify
+            objectPosition += directionVector * speed * Time.deltaTime;
+            //Write back
+            gameObject.GetComponent<Rigidbody>().transform.position = objectPosition;
+        }
+    }
 
-		//Decompose random radian and store in direction vector
-		tempVector.y = Mathf.Sin (tempAngle);
-		tempVector.x = Mathf.Cos (tempAngle);
+    public Vector3 NewAngle(bool random, bool invertDirection, float min, float max, float newAngle)
+    {
 
-		//Random direction
-		if((random && Random.value>0.5f)|| invertDirection ){tempVector.x *= -1;}
+        //Tempvector for return
+        Vector3 tempVector = Vector3.zero;
+        float tempAngle;
 
-		//Return startvector
-		return tempVector;
-	}
+        //Generate random radian from input range
+        if (random)
+        {
+            tempAngle = Random.Range(min, max);
+        }
+        else
+        {
+            tempAngle = newAngle;
+        }
+
+        tempAngle *= Mathf.Deg2Rad;
+
+        //Decompose random radian and store in direction vector
+        tempVector.y = Mathf.Sin(tempAngle);
+        tempVector.x = Mathf.Cos(tempAngle);
+
+        //Random direction
+        if ((random && Random.value > 0.5f) || invertDirection) { tempVector.x *= -1; }
+
+        //Return startvector
+        return tempVector;
+    }
 }
