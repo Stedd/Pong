@@ -2,71 +2,90 @@
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class Main : MonoBehaviour {
+public class Main : MonoBehaviour
+{
+    //Score variables
+    [Header("Scores")]
+    [SerializeField] private int playerScore;
+    [SerializeField] private int aiScore;
+    [SerializeField] private int winScore = 200;
 
-	//Bind text gameobjects for manipulation
-	public GameObject 	playerScoreText, aiScoreText, announceText;
+    [Header("Timers")]
+    [SerializeField] private float tempTime = 5;
+    [SerializeField] private float showWinTextTime = 5;
+    [SerializeField] private bool winConditionMet;
 
-	//Score variables
-	public int 			playerScore, aiScore;
-	private float		winScore = 2;
+    [Header("Textfields")]
+    [SerializeField] private TextMesh playerScoreText;
+    [SerializeField] private TextMesh aiScoreText;
+    [SerializeField] private TextMesh announceText;
 
-	//Timer
-	private float 		tempTime, showWinTextTime = 5;
-	public bool			winConditionMet;
 
-	void Start (){
-	
-		//Reset scores
-		winConditionMet = false;
-		playerScore = 0; 
-		aiScore 	= 0;
+    #region Publics
 
-		//Update score text
-		announceText.GetComponent<TextMesh> ().text = "";
-		playerScoreText.GetComponent<TextMesh> ().text 	= "Player Score: " 	+ playerScore.ToString ();
-		aiScoreText.GetComponent<TextMesh> ().text 		= "A.I Score: " 	+ aiScore.ToString ();
-	}
+    public bool WinConditionMet { get; }
 
-	void Update () {
+    #endregion
 
-		//Back to lobby if escape is pressed
-		if(Input.GetKey("escape")){SceneManager.LoadScene(0);}
 
-		//Winning condition
+    void Start()
+    {
+        //Reset scores
+        winConditionMet = false;
+        playerScore = 0;
+        aiScore = 0;
 
-		if (playerScore >= winScore && !winConditionMet) {
-			winCondition ("Player Wins");
-		}
-		 
-		if (aiScore >= winScore  && !winConditionMet) {
-			winCondition ("A.I Wins");
-		}
+        //Update score text
+        announceText.text = "";
+        playerScoreText.text = "Player Score: " + playerScore.ToString();
+        aiScoreText.text = "A.I Score: " + aiScore.ToString();
+    }
 
-		if (Time.time > tempTime && winConditionMet) {
-			SceneManager.LoadScene("Credits");
-		}
+    void Update()
+    {
 
-	}
+        //Back to lobby if escape is pressed
+        if (Input.GetKey(KeyCode.Escape)) { SceneManager.LoadScene(0); }
 
-	public void winCondition (string winnerName)
-	{
-		winConditionMet = true;
-		tempTime = Time.time + showWinTextTime;
-		announceText.GetComponent<TextMesh> ().text = winnerName;
-	}
+        //Winning condition
 
-	//Modify score based on announcement from hazards
-	public void updateScore(string hazardName){
-		if (hazardName == "West_wall") {
-			aiScore 	+=1;
-		}
-		if (hazardName == "East_wall") {
-			playerScore +=1;
-		}
-		//Update text
-		playerScoreText.GetComponent<TextMesh> ().text 	= "Player Score: " 	+ playerScore.ToString ();
-		aiScoreText.GetComponent<TextMesh> ().text 		= "A.I Score: " 	+ aiScore.ToString ();
+        if (playerScore >= winScore && !winConditionMet)
+        {
+            WinCondition("Player Wins");
+        }
 
-	}
+        if (aiScore >= winScore && !winConditionMet)
+        {
+            WinCondition("A.I Wins");
+        }
+
+        if (Time.time > tempTime && winConditionMet)
+        {
+            SceneManager.LoadScene("Credits");
+        }
+
+    }
+
+    public void WinCondition(string winnerName)
+    {
+        winConditionMet = true;
+        tempTime = Time.time + showWinTextTime;
+        announceText.text = winnerName;
+    }
+
+    //Modify score based on announcement from hazards
+    public void UpdateScore(string hazardName)
+    {
+        if (hazardName == "West_wall")
+        {
+            aiScore += 1;
+        }
+        if (hazardName == "East_wall")
+        {
+            playerScore += 1;
+        }
+        //Update text
+        playerScoreText.text = "Player Score: " + playerScore.ToString();
+        aiScoreText.text = "A.I Score: " + aiScore.ToString();
+    }
 }

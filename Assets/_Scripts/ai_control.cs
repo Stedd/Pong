@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ai_control : MonoBehaviour 
 {
-
+	[SerializeField] private Main _gameMaster;
 	public 	Vector3 	objectPosition;
 	public 	Vector3[]	ballPosition;
 	public 	float 		speed, posDiff, hysteresis;
@@ -22,7 +22,7 @@ public class ai_control : MonoBehaviour
 	// Update is called once per frame
 void Update ()
 	{
-		if (! (GameObject.FindWithTag("GameController").GetComponent<Main>().winConditionMet)) {
+		if (! (_gameMaster.WinConditionMet)) {
 			aiActivate ();
 		} 
 
