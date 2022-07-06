@@ -2,10 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Instantiator : MonoBehaviour
+public class ObjectPool : MonoBehaviour
 {
     #region Inspector
-
     //Load prefab
     [SerializeField] private GameObject _prefab;
     [SerializeField] private GameObject _ballPool;
@@ -26,35 +25,41 @@ public class Instantiator : MonoBehaviour
 
     #endregion
 
-    #region Private
-
-    private GameObject _tempGO;
-
-    #endregion
-
-    void Start()
+    void Awake()
     {
-        //		nextSpawn = 0.0f;
-        //		spawnRate = 0.7f;
         InitializePool();
     }
 
+    private void Start()
+    {
+        GetFreeBall();
+    }
     void Update()
     {
-        if (Input.GetKeyDown("mouse 0"))
+        if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            InitializePool();
-            //generateCluster ();
+            GetFreeBall();
         }
+    }
 
-        //		if (Time.time > nextSpawn) {
-        //			generate ();
-        //			nextSpawn = Time.time + spawnRate;
-        //		}
+    public void GetFreeBall()
+    {
+        foreach (GameObject ball in _objectPool)
+        {
+            if (!ball.activeSelf)
+            {
+                ball.transform.position = _positionVec;
+                ball.GetComponent<Rigidbody>().velocity = _velocityVec;
+                ball.SetActive(true);
+                break;
+            }
+        }
     }
 
     public void InitializePool()
     {
+        GameObject _tempGO;
+
         for (int i = 0; i < _objectsToSpawn; i++)
         {
             _tempGO = (GameObject)Instantiate(_prefab, _positionVec, Quaternion.Euler(_rotationVec), _ballPool.transform);
