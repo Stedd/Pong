@@ -4,18 +4,23 @@ using System.Collections;
 public class Hazard_zone : MonoBehaviour {
 
 	[SerializeField] private Main _gameMaster;
-	[SerializeField] private Instantiator _instantiator;
+	[SerializeField] private ObjectPool _instantiator;
 
 
 	void OnTriggerEnter(Collider other){
 		//Destroy ball
-		Destroy (other.gameObject);
-		//Generate new ball on collission
+		other.gameObject.SetActive(false);
+
 		if (!_gameMaster.WinConditionMet) {
-			_instantiator.InitializePool ();
+			Invoke(nameof(SpawnNewBall), Random.value*5);
 		}
 		//announce hazard name to Main script to update score
 		_gameMaster.UpdateScore (gameObject.name);
+	}
+
+	private void SpawnNewBall()
+    {
+		_instantiator.GetFreeBall();
 	}
 
 }
