@@ -1,52 +1,71 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
-public class ai_control : MonoBehaviour 
+public class AI_Control : MonoBehaviour
 {
-	[SerializeField] private Main _gameMaster;
-	public 	Vector3 	objectPosition;
-	public 	Vector3[]	ballPosition;
-	public 	float 		speed, posDiff, hysteresis;
-	public	float		ballPositionY;
-	public 	float 		minY, maxY;
-	
-	// Use this for initialization
-	void Start () 
-	{
-		speed 		= 23;
-		hysteresis 	= 3f;
-		minY 		= -12;
-		maxY		= 12;
-	}
-	
-	// Update is called once per frame
-void Update ()
-	{
-		if (! (_gameMaster.WinConditionMet)) {
-			aiActivate ();
-		} 
+    [SerializeField] private Main _gameMaster;
+    [SerializeField] private ObjectPool _objectPool;
+    [SerializeField] private GameObject _closestBall;
+    [SerializeField] private float speed = 23;
+    [SerializeField] private float posDiff;
+    [SerializeField] private float hysteresis = 3;
+    [SerializeField] private float ballPositionY;
+    [SerializeField] private float minY = -12;
+    [SerializeField] private float maxY = 12;
 
-	}
+    void Update()
+    {
+        if (!(_gameMaster.WinConditionMet))
+        {
+            aiActivate();
+        }
+    }
 
-	void aiActivate(){
-		//Temp store object position vector
-		objectPosition = gameObject.GetComponent<Rigidbody> ().transform.position;
-		//TODO:find closes ball and follow
-//		ballPositionY = FindObjectOfType<Movement> ().transform.position.y;
-		ballPositionY = GameObject.FindWithTag("Ball").GetComponent<Movement>().transform.position.y;
-		//Modify
-		posDiff = ballPositionY - objectPosition.y;
+    void aiActivate()
+    {
+        Vector3 position = gameObject.transform.position;
 
-		if ((posDiff > hysteresis) && objectPosition.y <= maxY) {
-			objectPosition.y += speed * Time.deltaTime;
-		}
-		if ((posDiff < hysteresis * -1) && objectPosition.y >= minY) {
-			objectPosition.y -= speed * Time.deltaTime;
-		}
+        if (_objectPool != null && _objectPool.ActiveBalls.Count > 0)
+        {
+            _closestBall = FindClosestBall();
+            ballPositionY = _closestBall.transform.position.y;
+        }
+        else
+        {
+            ballPositionY = position.y;
+        }
 
-		//Write back
-		gameObject.GetComponent<Rigidbody> ().transform.position = objectPosition;
-	}
+        //Modify
+        posDiff = ballPositionY - position.y;
+
+        if ((posDiff > hysteresis) && position.y <= maxY)
+        {
+            position.y += speed * Time.deltaTime;
+        }
+        if ((posDiff < hysteresis * -1) && position.y >= minY)
+        {
+            position.y -= speed * Time.deltaTime;
+        }
+
+        //Write back
+        gameObject.GetComponent<Rigidbody>().transform.position = position;
+    }
+
+    public GameObject FindClosestBall()
+    {
+        float currentMinimumDistance = float.MaxValue;
+        GameObject closestBall = _objectPool.ActiveBalls[0];
+        foreach (GameObject ball in _objectPool.ActiveBalls)
+        {
+            float distanceToCurrentBall = Vector3.Distance(gameObject.transform.position, ball.transform.position);
+            if (distanceToCurrentBall < currentMinimumDistance)
+            {
+                currentMinimumDistance = distanceToCurrentBall;
+                closestBall = ball;
+            }
+        }
+        return closestBall;
+    }
 }
 
 

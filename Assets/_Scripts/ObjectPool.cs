@@ -12,6 +12,7 @@ public class ObjectPool : MonoBehaviour
     [Header("ObjectPoolConfig")]
     [SerializeField] private int _objectsToSpawn = 40;
     [SerializeField] private List<GameObject> _objectPool;
+    [SerializeField] private List<GameObject> _activeBalls;
     //Temp gameobject for setting new object configuration	
     //InstantiateID
     [SerializeField] private string _instantiateName;
@@ -25,6 +26,13 @@ public class ObjectPool : MonoBehaviour
 
     #endregion
 
+    #region Publics
+
+    public List<GameObject> ActiveBalls { get => _activeBalls; }
+
+    #endregion
+
+
     void Awake()
     {
         InitializePool();
@@ -32,13 +40,24 @@ public class ObjectPool : MonoBehaviour
 
     private void Start()
     {
-        GetFreeBall();
+        //GetFreeBall();
+        GenerateCluster();
     }
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             GetFreeBall();
+        }
+
+        _activeBalls.Clear();
+
+        foreach (GameObject ball in _objectPool)
+        {
+            if (ball.activeSelf)
+            {
+                _activeBalls.Add(ball);
+            }
         }
     }
 
@@ -56,6 +75,21 @@ public class ObjectPool : MonoBehaviour
         }
     }
 
+    public void GetFreeBall(Vector3 pos)
+    {
+        foreach (GameObject ball in _objectPool)
+        {
+            if (!ball.activeSelf)
+            {
+                ball.transform.position = pos;
+                ball.GetComponent<Rigidbody>().velocity = _velocityVec;
+                ball.SetActive(true);
+                break;
+            }
+        }
+    }
+
+
     public void InitializePool()
     {
         GameObject _tempGO;
@@ -72,15 +106,13 @@ public class ObjectPool : MonoBehaviour
     }
 
     [ContextMenu("GenerateCluster")]
-    void generateCluster()
+    void GenerateCluster()
     {
         for (int i = -_gridSizeX / 2; i <= _gridSizeX / 2; i++)
         {
             for (int j = -_gridSizeY / 2; j <= _gridSizeY / 2; j++)
             {
-                GameObject newBall = (GameObject)Instantiate(_prefab, new Vector3(i * 2, j * 2, 0), Quaternion.Euler(_rotationVec), _ballPool.transform);
-                newBall.name = $"ClusterBall[{i},{j}]";
-
+                GetFreeBall(new Vector3(i * 2, j * 2, 0));
             }
         }
     }

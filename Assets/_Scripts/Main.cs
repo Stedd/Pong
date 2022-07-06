@@ -20,7 +20,6 @@ public class Main : MonoBehaviour
     [SerializeField] private TextMesh aiScoreText;
     [SerializeField] private TextMesh announceText;
 
-
     #region Publics
 
     public bool WinConditionMet { get; }
